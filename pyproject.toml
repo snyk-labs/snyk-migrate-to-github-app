@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "snyk-migrate-to-github-app"
+version = "0.1.0"
+description = ""
+authors = ["Troy Havelock <troy.havelock@snyk.io>"]
+readme = "README.md"
+packages = [{include = "snyk_migrate_to_github_app"}]
+
+[tool.poetry.scripts]
+snyk-migrate-to-github-app = "snyk_migrate_to_github_app.main:run"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+typer = "^0.9.0"
+rich = "^13.7.0"
+requests = "^2.31.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

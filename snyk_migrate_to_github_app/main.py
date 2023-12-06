@@ -45,6 +45,11 @@ def main(
             bool,
             typer.Option(
                 help='Print names of targets to be migrated without migrating')] = False,
+    include_github_targets:
+        Annotated[
+            bool,
+            typer.Option(
+                help='Migrate both github and github-enterprise projects, default is only github-enterprise')] = False,
     verbose: bool = False):
     """CLI Tool to help you migrate your targets from the GitHub or GitHub Enterprise integration to the new GitHub App Integration
     """
@@ -52,7 +57,10 @@ def main(
         state["verbose"] = True
 
     if verify_org_integrations(snyk_token, org_id):
-        targets = get_all_targets(snyk_token, org_id, )
+        targets = get_all_targets(snyk_token, org_id)
+
+        if include_github_targets:
+            targets.extend(get_all_targets(snyk_token, org_id, origin='github'))
 
         if (dry_run):
             dry_run_targets(targets)
@@ -60,7 +68,15 @@ def main(
             migrate_targets(snyk_token, org_id, targets)
 
 def verify_org_integrations(snyk_token, org_id):
+    """Helper function to make sure the Snyk Organization has the relevant github integrations set up
 
+    Args:
+        snyk_token (str): Snyk API token
+        org_id (str): Snyk Organization ID
+
+    Returns:
+        bool: _description_
+    """
     headers = {
         'Authorization': f'token {snyk_token}'
     }
@@ -93,11 +109,16 @@ def verify_org_integrations(snyk_token, org_id):
 
     return True
 
-def get_all_targets(snyk_token, org_id):
+def get_all_targets(snyk_token, org_id, origin='github-enterprise'):
     """Helper function to retrieve targets in an org
 
+    Args:
+        snyk_token (str): Snyk API token
+        org_id (str): Snyk Organization ID
+        origin (str, optional): Filter to retrieve targets of a certain origin. Defaults to 'github-enterprise'.
+
     Returns:
-        list: targets in org
+        list: github targets in a snyk org
     """
 
     targets = []
@@ -106,7 +127,7 @@ def get_all_targets(snyk_token, org_id):
         'Authorization': f'token {snyk_token}'
     }
 
-    url = f'{SNYK_REST_API_BASE_URL}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&origin=github-enterprise'
+    url = f'{SNYK_REST_API_BASE_URL}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&origin={origin}'
 
     while True:
         response = requests.request(
@@ -130,7 +151,7 @@ def dry_run_targets(targets):
     """Print targets that would get migrated to GitHub App integration without migrating them
 
     Args:
-        targets: dictionary of targets to be logged
+        targets: List of targets to be logged
     """
     for target in targets:
         print(f"Target: {target['id']}, Name: {target['attributes']['displayName']}")
@@ -139,7 +160,13 @@ def dry_run_targets(targets):
     print(f"Total Targets: {len(targets)}")
 
 def migrate_targets(snyk_token, org_id, targets):
+    """Helper function to migrate list of github and github-enterprise targets to github-cloud-app
 
+    Args:
+        snyk_token (str): Snyk API token
+        org_id (str): Snyk Organization ID
+        targets (list): List of targets to be migrated
+    """
     headers = {
         'Content-Type': 'application/vnd.api+json',
         'Authorization': f'token {snyk_token}'
@@ -166,10 +193,12 @@ def migrate_targets(snyk_token, org_id, targets):
 
         if response.status_code == 200:
             print(f"Migrated target: {target['id']} {target['attributes']['displayName']} to github-cloud-app")
+        elif response.status_code == 409:
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to github-cloud-app because it has already been migrated")
         else:
-            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to github-cloud-app")
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to github-cloud-app, reason: {response.status_code}")
 
 def run():
-    """Run the defined typer app
+    """Run the defined typer CLI app
     """
     app()

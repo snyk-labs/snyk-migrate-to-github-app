@@ -96,7 +96,7 @@ def verify_org_integrations(snyk_token, org_id):
 
     integrations = json.loads(response.content)
 
-    if ('github-enterprise' not in integrations or
+    if ('github-enterprise' not in integrations and
         'github' not in integrations):
 
         print(f"No GitHub or GitHub Enterprise integration detected for Snyk Org: {org_id}")

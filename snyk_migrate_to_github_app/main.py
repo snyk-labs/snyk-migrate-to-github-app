@@ -127,7 +127,7 @@ def get_all_targets(snyk_token, org_id, origin='github-enterprise'):
         'Authorization': f'token {snyk_token}'
     }
 
-    url = f'{SNYK_REST_API_BASE_URL}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&origin={origin}'
+    url = f'{SNYK_REST_API_BASE_URL}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&origin={origin}&excludeEmpty=false'
 
     while True:
         response = requests.request(

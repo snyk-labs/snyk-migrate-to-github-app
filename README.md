@@ -1,3 +1,5 @@
+![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-community.jpg)
+
 # Migrate to GitHub Cloud App
 
 ## Introduction

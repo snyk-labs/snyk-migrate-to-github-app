@@ -13,8 +13,8 @@ from typing_extensions import Annotated
 # ===== CONSTANTS =====
 
 SNYK_V1_API_BASE_URL        = 'https://snyk.io/api/v1'
-SNYK_V1_API_BASE_URL_AU     = 'https://snyk.au.io/api/v1'
-SNYK_V1_API_BASE_URL_EU     = 'https://snyk.eu.io/api/v1'
+SNYK_V1_API_BASE_URL_AU     = 'https://api.au.snyk.io/v1'
+SNYK_V1_API_BASE_URL_EU     = 'https://api.eu.snyk.io/v1/'
 SNYK_REST_API_BASE_URL      = 'https://api.snyk.io/rest'
 SNYK_REST_API_BASE_URL_AU   = 'https://api.au.snyk.io/rest'
 SNYK_REST_API_BASE_URL_EU   = 'https://api.eu.snyk.io/rest'

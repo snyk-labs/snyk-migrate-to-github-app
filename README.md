@@ -71,6 +71,16 @@ Running the tool will immediately start the migration process. However, you may 
 snyk-migrate-to-github-app <ORG_ID> <SNYK_TOKEN> --dry-run
 ```
 
+You can specify EU or AU tenants with the `--tenant` option
+
+```shell
+# EU Tenant
+snyk-migrate-to-github-app <ORG_ID> <SNYK_TOKEN> --tenant=eu
+
+# AU Tenant
+snyk-migrate-to-github-app <ORG_ID> <SNYK_TOKEN> --tenant=au
+```
+
 By default, only targets imported with the *GitHub Enterprise* integration will be migrated to the new GitHub Cloud App. If you wish to also include targets that were imported with the *GitHub* integration as well, you can pass the `--include-github-targets` option
 ```shell
 snyk-migrate-to-github-app <ORG_ID> <SNYK_TOKEN> --include-github-targets

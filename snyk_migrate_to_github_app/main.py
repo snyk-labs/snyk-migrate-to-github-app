@@ -34,7 +34,7 @@ state = {"verbose": False}
 
 
 @app.command()
-def main(
+def main(  # pylint: disable=too-many-arguments
     org_id: Annotated[
         str,
         typer.Argument(
@@ -115,30 +115,30 @@ def verify_org_integrations(snyk_token, org_id, tenant=""):
     except requests.ConnectionError:
         print(f"Unable to connect to {base_url}")
         return False
-    else:
-        if response.status_code != 200:
-            print(
-                f"Unable to retrieve integrations for Snyk org: {org_id}, reason: {response.status_code}"
-            )
-            return False
 
-        integrations = json.loads(response.content)
+    if response.status_code != 200:
+        print(
+            f"Unable to retrieve integrations for Snyk org: {org_id}, reason: {response.status_code}"
+        )
+        return False
 
-        if "github-enterprise" not in integrations and "github" not in integrations:
+    integrations = json.loads(response.content)
 
-            print(
-                f"No GitHub or GitHub Enterprise integration detected for Snyk Org: {org_id}"
-            )
-            return False
+    if "github-enterprise" not in integrations and "github" not in integrations:
 
-        if "github-cloud-app" not in integrations:
+        print(
+            f"No GitHub or GitHub Enterprise integration detected for Snyk Org: {org_id}"
+        )
+        return False
 
-            print(
-                f"No GitHub Cloud App integration detected for Snyk Org: {org_id}, please set up before migrating GitHub or GitHub Enterprise targets"
-            )
-            return False
+    if "github-cloud-app" not in integrations:
 
-        return True
+        print(
+            f"No GitHub Cloud App integration detected for Snyk Org: {org_id}, please set up before migrating GitHub or GitHub Enterprise targets"
+        )
+        return False
+
+    return True
 
 
 def get_all_targets(snyk_token, org_id, origin="github-enterprise", tenant=""):

@@ -61,6 +61,11 @@ def main(
             bool,
             typer.Option(
                 help='Migrate both github and github-enterprise projects, default is only github-enterprise')] = False,
+    github_server_app:
+        Annotated[
+            bool,
+            typer.Option(
+                help="Migrate to github-server-app, Defaults to False (github-cloud-app)")] = False,
     verbose: bool = False):
     """CLI Tool to help you migrate your targets from the GitHub or GitHub Enterprise integration to the new GitHub App Integration
     """
@@ -72,7 +77,7 @@ def main(
         print("Must me either 'eu' or 'au'")
         return
 
-    if verify_org_integrations(snyk_token, org_id, tenant=tenant):
+    if verify_org_integrations(snyk_token, org_id, github_server_app=github_server_app, tenant=tenant):
         targets = get_all_targets(snyk_token, org_id, tenant=tenant)
 
         if include_github_targets:
@@ -83,7 +88,7 @@ def main(
         else:
             migrate_targets(snyk_token, org_id, targets, tenant=tenant)
 
-def verify_org_integrations(snyk_token, org_id, tenant=''):
+def verify_org_integrations(snyk_token, org_id, github_server_app=False, tenant=''):
     """Helper function to make sure the Snyk Organization has the relevant github integrations set up
 
     Args:
@@ -130,10 +135,13 @@ def verify_org_integrations(snyk_token, org_id, tenant=''):
             print(f"No GitHub or GitHub Enterprise integration detected for Snyk Org: {org_id}")
             return False
 
-        if ('github-cloud-app' not in integrations):
-
-            print(f"No GitHub Cloud App integration detected for Snyk Org: {org_id}, please set up before migrating GitHub or GitHub Enterprise targets")
-            return False
+        if (github_server_app):
+            if ('github-server-app' not in integrations):
+                print(f"No GitHub Server App integration detected for Snyk Org: {org_id}, please set up before migrating GitHub or GitHub Enterprise targets")
+        else:
+            if ('github-cloud-app' not in integrations):
+                print(f"No GitHub Cloud App integration detected for Snyk Org: {org_id}, please set up before migrating GitHub or GitHub Enterprise targets")
+                return False
 
         return True
 
@@ -195,7 +203,7 @@ def dry_run_targets(targets):
     print()
     print(f"Total Targets: {len(targets)}")
 
-def migrate_targets(snyk_token, org_id, targets, tenant=''):
+def migrate_targets(snyk_token, org_id, targets, github_server_app=False, tenant=''):
     """Helper function to migrate list of github and github-enterprise targets to github-cloud-app
 
     Args:
@@ -212,6 +220,11 @@ def migrate_targets(snyk_token, org_id, targets, tenant=''):
     if tenant == 'eu':
         base_url = SNYK_HIDDEN_API_BASE_URL_EU
 
+    source_type = 'github-cloud-app'
+
+    if github_server_app:
+        source_type = 'github-server-app'
+
     headers = {
         'Content-Type': 'application/vnd.api+json',
         'Authorization': f'token {snyk_token}'
@@ -224,7 +237,7 @@ def migrate_targets(snyk_token, org_id, targets, tenant=''):
             "data": {
                 "id": f"{target['id']}",
                 "attributes": {
-                    "source_type": "github-cloud-app"
+                    "source_type": f"{source_type}"
                 }
             }
         })
@@ -237,11 +250,11 @@ def migrate_targets(snyk_token, org_id, targets, tenant=''):
             timeout=SNYK_API_TIMEOUT_DEFAULT)
 
         if response.status_code == 200:
-            print(f"Migrated target: {target['id']} {target['attributes']['displayName']} to github-cloud-app")
+            print(f"Migrated target: {target['id']} {target['attributes']['displayName']} to {source_type}")
         elif response.status_code == 409:
-            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to github-cloud-app because it has already been migrated")
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to {source_type} because it has already been migrated")
         else:
-            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to github-cloud-app, reason: {response.status_code}")
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to {source_type}, reason: {response.status_code}")
 
 def run():
     """Run the defined typer CLI app

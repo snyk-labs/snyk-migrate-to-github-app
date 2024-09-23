@@ -18,7 +18,7 @@ SNYK_V1_API_BASE_URL_EU     = 'https://api.eu.snyk.io/v1/'
 SNYK_REST_API_BASE_URL      = 'https://api.snyk.io/rest'
 SNYK_REST_API_BASE_URL_AU   = 'https://api.au.snyk.io/rest'
 SNYK_REST_API_BASE_URL_EU   = 'https://api.eu.snyk.io/rest'
-SNYK_REST_API_VERSION       = '2023-11-27~beta'
+SNYK_REST_API_VERSION       = '2024-08-25'
 SNYK_HIDDEN_API_BASE_URL    = 'https://api.snyk.io/hidden'
 SNYK_HIDDEN_API_BASE_URL_AU = 'https://api.au.snyk.io/hidden'
 SNYK_HIDDEN_API_BASE_URL_EU = 'https://api.eu.snyk.io/hidden'
@@ -86,7 +86,7 @@ def main(
         if (dry_run):
             dry_run_targets(targets)
         else:
-            migrate_targets(snyk_token, org_id, targets, tenant=tenant)
+            migrate_targets(snyk_token, org_id, targets, github_server_app=github_server_app, tenant=tenant)
 
 def verify_org_integrations(snyk_token, org_id, github_server_app=False, tenant=''):
     """Helper function to make sure the Snyk Organization has the relevant github integrations set up
@@ -94,6 +94,7 @@ def verify_org_integrations(snyk_token, org_id, github_server_app=False, tenant=
     Args:
         snyk_token (str): Snyk API token
         org_id (str): Snyk Organization ID
+        github_server_app (bool, optional): Flag to indicate migrating to GitHub Server App
         tenant (str, optional): Snyk tenant
 
     Returns:
@@ -171,7 +172,7 @@ def get_all_targets(snyk_token, org_id, origin='github-enterprise', tenant=''):
     if tenant == 'eu':
         base_url = SNYK_REST_API_BASE_URL_EU
 
-    url = f'{base_url}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&origin={origin}&excludeEmpty=false'
+    url = f'{base_url}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&source_types={origin}&exclude_empty=false'
 
     while True:
         response = requests.request(
@@ -198,7 +199,7 @@ def dry_run_targets(targets):
         targets: List of targets to be logged
     """
     for target in targets:
-        print(f"Target: {target['id']}, Name: {target['attributes']['displayName']}")
+        print(f"Target: {target['id']}, Name: {target['attributes']['display_name']}")
 
     print()
     print(f"Total Targets: {len(targets)}")
@@ -210,6 +211,7 @@ def migrate_targets(snyk_token, org_id, targets, github_server_app=False, tenant
         snyk_token (str): Snyk API token
         org_id (str): Snyk Organization ID
         targets (list): List of targets to be migrated
+        github_server_app (bool, optional): Flag to indicate migrating to GitHub Server App
         tenant (str, optional): Snyk tenant
     """
 
@@ -250,11 +252,11 @@ def migrate_targets(snyk_token, org_id, targets, github_server_app=False, tenant
             timeout=SNYK_API_TIMEOUT_DEFAULT)
 
         if response.status_code == 200:
-            print(f"Migrated target: {target['id']} {target['attributes']['displayName']} to {source_type}")
+            print(f"Migrated target: {target['id']} {target['attributes']['display_name']} to {source_type}")
         elif response.status_code == 409:
-            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to {source_type} because it has already been migrated")
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['display_name']} to {source_type} because it has already been migrated")
         else:
-            print(f"Unable to migrate target: {target['id']} {target['attributes']['displayName']} to {source_type}, reason: {response.status_code}")
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['display_name']} to {source_type}, reason: {response.status_code}")
 
 def run():
     """Run the defined typer CLI app

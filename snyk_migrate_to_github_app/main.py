@@ -256,7 +256,7 @@ def migrate_targets(snyk_token, org_id, targets, github_server_app=False, tenant
         elif response.status_code == 409:
             print(f"Unable to migrate target: {target['id']} {target['attributes']['display_name']} to {source_type} because it has already been migrated")
         else:
-            print(f"Unable to migrate target: {target['id']} {target['attributes']['display_name']} to {source_type}, reason: {response.status_code}")
+            print(f"Unable to migrate target: {target['id']} {target['attributes']['display_name']} to {source_type}, reason: {response.status_code}, request ID: {response.headers['snyk-request-id']}")
 
 def run():
     """Run the defined typer CLI app

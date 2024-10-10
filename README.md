@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This tool is designed to help you easily migrate your Snyk Targets that were imported using either the existing GitHub or GitHub Enterprise integrations to the new GitHub Cloud App integration. Below, you will learn how to install the tool and how to run the tool.
+This tool is designed to help you easily migrate your Snyk Targets that were imported using either the existing GitHub or GitHub Enterprise integrations to the new GitHub Cloud App or GitHub Server App integrations. Below, you will learn how to install the tool and how to run the tool.
 
 ## Installation
 
@@ -39,7 +39,7 @@ snyk-migrate-to-github-app --help
 
 ## Using the Tool
 
-All you need to run the tool is a [Snyk API token](https://docs.snyk.io/getting-started/how-to-obtain-and-authenticate-with-your-snyk-api-token) and the Organization ID of the Organization where you want to migrate your targets to the new GitHub Cloud App
+All you need to run the tool is a [Snyk API token](https://docs.snyk.io/getting-started/how-to-obtain-and-authenticate-with-your-snyk-api-token) and the Organization ID of the Organization where you want to migrate your targets to the new GitHub Cloud App or GitHub Server App
 
 **Before Running the Tool:** It is assumed that the GitHub Cloud App integration has already been configured in the Snyk Organization where you will be migrating targets
 
@@ -63,6 +63,12 @@ Alternatively, instead of passing the Snyk Token and Org ID in line, you can def
 export SNYK_TOKEN=<YOUR_SNYK_TOKEN>
 export SNYK_ORG_ID=<YOUR_ORGANIZATION_ID>
 snyk-migrate-to-github-app
+```
+
+By default, it is assumed you are migrating to the GitHub Cloud App. If you want to migrate to the GitHub Server App, include the flag as follows
+
+```shell
+snyk-migrate-to-github-app <ORG_ID> <SNYK_TOKEN> --github-server-app
 ```
 
 Running the tool will immediately start the migration process. However, you may want to see which projects will be migrated before you start the migration process. You can run the tool with the `--dry-run` option which will only print the effected targets to the terminal without actually migrating them

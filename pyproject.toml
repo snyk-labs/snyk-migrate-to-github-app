@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "snyk-migrate-to-github-app"
-version = "0.1.0"
+version = "0.1.1"
 description = ""
 authors = ["Troy Havelock <troy.havelock@snyk.io>"]
 readme = "README.md"

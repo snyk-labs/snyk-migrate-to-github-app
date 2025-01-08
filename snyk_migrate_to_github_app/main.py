@@ -15,9 +15,9 @@ from typing_extensions import Annotated
 SNYK_V1_API_BASE_URL        = 'https://snyk.io/api/v1'
 SNYK_V1_API_BASE_URL_AU     = 'https://api.au.snyk.io/v1'
 SNYK_V1_API_BASE_URL_EU     = 'https://api.eu.snyk.io/v1/'
-SNYK_REST_API_BASE_URL      = 'https://api.snyk.io/rest'
-SNYK_REST_API_BASE_URL_AU   = 'https://api.au.snyk.io/rest'
-SNYK_REST_API_BASE_URL_EU   = 'https://api.eu.snyk.io/rest'
+SNYK_REST_API_BASE_URL      = 'https://api.snyk.io'
+SNYK_REST_API_BASE_URL_AU   = 'https://api.au.snyk.io'
+SNYK_REST_API_BASE_URL_EU   = 'https://api.eu.snyk.io'
 SNYK_REST_API_VERSION       = '2024-08-25'
 SNYK_HIDDEN_API_BASE_URL    = 'https://api.snyk.io/hidden'
 SNYK_HIDDEN_API_BASE_URL_AU = 'https://api.au.snyk.io/hidden'
@@ -172,7 +172,7 @@ def get_all_targets(snyk_token, org_id, origin='github-enterprise', tenant=''):
     if tenant == 'eu':
         base_url = SNYK_REST_API_BASE_URL_EU
 
-    url = f'{base_url}/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&source_types={origin}&exclude_empty=false'
+    url = f'{base_url}/rest/orgs/{org_id}/targets?version={SNYK_REST_API_VERSION}&limit=100&source_types={origin}&exclude_empty=false'
 
     while True:
         response = requests.request(

@@ -1,6 +1,6 @@
 ![snyk-oss-category](https://github.com/snyk-labs/oss-images/blob/main/oss-community.jpg)
 
-# Migrate to GitHub Cloud App
+# Migrate to GitHub Cloud App or GitHub Server App
 
 ## Introduction
 
@@ -41,7 +41,7 @@ snyk-migrate-to-github-app --help
 
 All you need to run the tool is a [Snyk API token](https://docs.snyk.io/getting-started/how-to-obtain-and-authenticate-with-your-snyk-api-token) and the Organization ID of the Organization where you want to migrate your targets to the new GitHub Cloud App or GitHub Server App
 
-**Before Running the Tool:** It is assumed that the GitHub Cloud App integration has already been configured in the Snyk Organization where you will be migrating targets
+**Before Running the Tool:** It is assumed that the GitHub Cloud App or GitHub Server App integration has already been configured in the Snyk Organization where you will be migrating targets
 
 To show the usage in the terminal
 ```shell
